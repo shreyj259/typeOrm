@@ -22,10 +22,15 @@ const config = {
 
 app.use(auth(config));
 
+
+
 app.get('/search',async(req:any,res:any)=>{
     const userRepo=AppDataSource.getRepository(Cat);
+    const builder =userRepo.createQueryBuilder('cats');
     const {age_lte,age_gte}=req.query;
-    const cats=userRepo.findBy({age:Between(5,20)});
+    const cats=await builder.where('cats.age >= :age_lte', {age_lte:age_lte})
+    .andWhere('cats.age <= :age_gte', {age_gte:age_gte})
+    .getMany();
     console.log(cats);
     res.send(JSON.stringify(cats));
 })
